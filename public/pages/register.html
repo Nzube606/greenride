@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GreenRide — Register</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+      }
+    </style>
+  </head>
+  <body
+    class="min-h-screen bg-green-50 flex items-center justify-center px-4 py-10"
+  >
+    <div class="bg-white rounded-2xl shadow-lg w-full max-w-md p-8">
+      <!-- Logo -->
+      <div class="text-center mb-8">
+        <div
+          class="inline-flex items-center justify-center w-16 h-16 bg-green-600 rounded-full mb-4"
+        >
+          <span class="text-white text-2xl">🛺</span>
+        </div>
+        <h1 class="text-2xl font-bold text-green-700">GreenRide</h1>
+        <p class="text-gray-500 text-sm mt-1">Create your account</p>
+      </div>
+
+      <!-- Error message -->
+      <div
+        id="errorMsg"
+        class="hidden bg-red-100 text-red-700 text-sm rounded-lg px-4 py-3 mb-4"
+      ></div>
+
+      <!-- Success message -->
+      <div
+        id="successMsg"
+        class="hidden bg-green-100 text-green-700 text-sm rounded-lg px-4 py-3 mb-4"
+      ></div>
+
+      <!-- Form -->
+      <form id="registerForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Full Name</label
+          >
+          <input
+            type="text"
+            id="fullName"
+            placeholder="Enter your full name"
+            class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            required
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Email Address</label
+          >
+          <input
+            type="email"
+            id="email"
+            placeholder="Enter your email"
+            class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            required
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Phone Number</label
+          >
+          <input
+            type="tel"
+            id="phone"
+            placeholder="e.g. 08012345678"
+            class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            required
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Password</label
+          >
+          <input
+            type="password"
+            id="password"
+            placeholder="Minimum 6 characters"
+            class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            required
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >I am registering as</label
+          >
+          <select
+            id="role"
+            class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          >
+            <option value="passenger">Passenger (Student/Staff)</option>
+            <option value="driver">Driver (Tricycle Operator)</option>
+          </select>
+        </div>
+
+        <!-- Vehicle number — only shown for drivers -->
+        <div id="vehicleField" class="hidden">
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Vehicle Number</label
+          >
+          <input
+            type="text"
+            id="vehicleNumber"
+            placeholder="e.g. GR-001"
+            class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+        </div>
+
+        <button
+          type="submit"
+          id="registerBtn"
+          class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition duration-200 mt-2"
+        >
+          Create Account
+        </button>
+      </form>
+
+      <p class="text-center text-sm text-gray-500 mt-6">
+        Already have an account?
+        <a href="login.html" class="text-green-600 font-medium hover:underline"
+          >Login here</a
+        >
+      </p>
+    </div>
+
+    <script>
+      const API = "http://localhost:5000/api";
+
+      // Show vehicle field when driver is selected
+      document.getElementById("role").addEventListener("change", (e) => {
+        const vehicleField = document.getElementById("vehicleField");
+        if (e.target.value === "driver") {
+          vehicleField.classList.remove("hidden");
+        } else {
+          vehicleField.classList.add("hidden");
+        }
+      });
+
+      document
+        .getElementById("registerForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const fullName = document.getElementById("fullName").value.trim();
+          const email = document.getElementById("email").value.trim();
+          const phone = document.getElementById("phone").value.trim();
+          const password = document.getElementById("password").value.trim();
+          const role = document.getElementById("role").value;
+          const vehicleNumber = document
+            .getElementById("vehicleNumber")
+            .value.trim();
+
+          const errorMsg = document.getElementById("errorMsg");
+          const successMsg = document.getElementById("successMsg");
+          const registerBtn = document.getElementById("registerBtn");
+
+          errorMsg.classList.add("hidden");
+          successMsg.classList.add("hidden");
+          registerBtn.textContent = "Creating account...";
+          registerBtn.disabled = true;
+
+          try {
+            const res = await fetch(`${API}/auth/register`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                fullName,
+                email,
+                phone,
+                password,
+                role,
+                vehicleNumber,
+              }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+              errorMsg.textContent = data.message;
+              errorMsg.classList.remove("hidden");
+              registerBtn.textContent = "Create Account";
+              registerBtn.disabled = false;
+              return;
+            }
+
+            // Save token and user to localStorage
+            localStorage.setItem("greenride_token", data.token);
+            localStorage.setItem("greenride_user", JSON.stringify(data.user));
+
+            successMsg.textContent =
+              "Account created successfully! Redirecting...";
+            successMsg.classList.remove("hidden");
+
+            setTimeout(() => {
+              if (data.user.role === "passenger") {
+                window.location.href = "passenger.html";
+              } else if (data.user.role === "driver") {
+                window.location.href = "driver.html";
+              }
+            }, 1500);
+          } catch (err) {
+            errorMsg.textContent =
+              "Unable to connect to server. Please try again.";
+            errorMsg.classList.remove("hidden");
+            registerBtn.textContent = "Create Account";
+            registerBtn.disabled = false;
+          }
+        });
+    </script>
+  </body>
+</html>
