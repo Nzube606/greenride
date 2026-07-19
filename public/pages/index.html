@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GreenRide — Smart Campus Mobility</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+      }
+      .hero-gradient {
+        background: linear-gradient(135deg, #14532d 0%, #16a34a 100%);
+      }
+      .feature-card:hover {
+        transform: translateY(-4px);
+        transition: transform 0.2s ease;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-white">
+    <!-- Navigation -->
+    <nav
+      class="bg-white shadow-sm px-6 py-4 flex justify-between items-center sticky top-0 z-50"
+    >
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">🛺</span>
+        <span class="font-bold text-green-700 text-lg">GreenRide</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <a
+          href="login.html"
+          class="text-sm text-green-700 font-medium hover:bg-green-100 px-4 py-2 rounded-full transition border border-green-500"
+          >Login</a
+        >
+        <a
+          href="register.html"
+          class="text-sm bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-full font-medium transition"
+          >Get Started</a
+        >
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient text-white px-6 py-20 text-center">
+      <div class="max-w-2xl mx-auto space-y-6">
+        <div class="text-6xl mb-4">🛺</div>
+        <h1 class="text-4xl font-bold leading-tight">
+          Smart Campus Mobility for University of Port Harcourt
+        </h1>
+        <p class="text-green-100 text-lg">
+          Request a solar-powered tricycle from anywhere on campus and get there
+          faster. No more waiting, no more guessing.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center mt-8">
+          <a
+            href="register.html"
+            class="bg-white text-green-700 font-semibold px-8 py-3 rounded-full hover:bg-green-50 transition"
+          >
+            Request a Ride
+          </a>
+          <a
+            href="login.html"
+            class="border border-white text-white font-semibold px-8 py-3 rounded-full hover:bg-green-700 transition"
+          >
+            I already have an account
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="py-16 px-6 bg-gray-50">
+      <div class="max-w-3xl mx-auto">
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-12">
+          How GreenRide Works
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="text-center space-y-3 feature-card">
+            <div
+              class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto text-2xl"
+            >
+              📍
+            </div>
+            <h3 class="font-semibold text-gray-800">
+              1. Describe Your Location
+            </h3>
+            <p class="text-sm text-gray-500">
+              Type where you are or use GPS to share your exact location on
+              campus.
+            </p>
+          </div>
+
+          <div class="text-center space-y-3 feature-card">
+            <div
+              class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto text-2xl"
+            >
+              🛺
+            </div>
+            <h3 class="font-semibold text-gray-800">2. Driver Accepts</h3>
+            <p class="text-sm text-gray-500">
+              An available solar-powered tricycle driver receives your request
+              and accepts in real time.
+            </p>
+          </div>
+
+          <div class="text-center space-y-3 feature-card">
+            <div
+              class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto text-2xl"
+            >
+              ✅
+            </div>
+            <h3 class="font-semibold text-gray-800">3. Track and Ride</h3>
+            <p class="text-sm text-gray-500">
+              Watch your driver approach on a live map and get to your
+              destination fast.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="py-16 px-6">
+      <div class="max-w-3xl mx-auto">
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-12">
+          Why GreenRide?
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div
+            class="flex gap-4 items-start p-5 border border-gray-100 rounded-xl feature-card"
+          >
+            <span class="text-2xl">⚡</span>
+            <div>
+              <h3 class="font-semibold text-gray-800 mb-1">
+                Real-Time Matching
+              </h3>
+              <p class="text-sm text-gray-500">
+                Your ride request reaches all available drivers instantly
+                through our live system.
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="flex gap-4 items-start p-5 border border-gray-100 rounded-xl feature-card"
+          >
+            <span class="text-2xl">🌱</span>
+            <div>
+              <h3 class="font-semibold text-gray-800 mb-1">Solar Powered</h3>
+              <p class="text-sm text-gray-500">
+                Every tricycle on GreenRide runs on solar energy. Clean, quiet,
+                and sustainable.
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="flex gap-4 items-start p-5 border border-gray-100 rounded-xl feature-card"
+          >
+            <span class="text-2xl">🗺️</span>
+            <div>
+              <h3 class="font-semibold text-gray-800 mb-1">
+                Live Map Tracking
+              </h3>
+              <p class="text-sm text-gray-500">
+                See your driver moving toward you on a live map so you always
+                know when they will arrive.
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="flex gap-4 items-start p-5 border border-gray-100 rounded-xl feature-card"
+          >
+            <span class="text-2xl">📱</span>
+            <div>
+              <h3 class="font-semibold text-gray-800 mb-1">No App Download</h3>
+              <p class="text-sm text-gray-500">
+                GreenRide works in any browser on your phone or laptop. Nothing
+                to install.
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="flex gap-4 items-start p-5 border border-gray-100 rounded-xl feature-card"
+          >
+            <span class="text-2xl">🔒</span>
+            <div>
+              <h3 class="font-semibold text-gray-800 mb-1">
+                Secure and Accountable
+              </h3>
+              <p class="text-sm text-gray-500">
+                Every ride is recorded. Every driver is registered. Every trip
+                is traceable.
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="flex gap-4 items-start p-5 border border-gray-100 rounded-xl feature-card"
+          >
+            <span class="text-2xl">🏫</span>
+            <div>
+              <h3 class="font-semibold text-gray-800 mb-1">
+                Built for UniPort
+              </h3>
+              <p class="text-sm text-gray-500">
+                Designed specifically for the University of Port Harcourt campus
+                and its unique transport needs.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="hero-gradient text-white py-16 px-6 text-center">
+      <div class="max-w-xl mx-auto space-y-4">
+        <h2 class="text-2xl font-bold">Ready to ride smarter?</h2>
+        <p class="text-green-100">
+          Join students and staff already using GreenRide to move faster across
+          campus.
+        </p>
+        <a
+          href="register.html"
+          class="inline-block bg-white text-green-700 font-semibold px-8 py-3 rounded-full hover:bg-green-50 transition mt-4"
+        >
+          Create Your Account
+        </a>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 px-6 py-8 text-center">
+      <div class="flex items-center justify-center gap-2 mb-2">
+        <span class="text-xl">🛺</span>
+        <span class="font-bold text-white">GreenRide</span>
+      </div>
+      <p class="text-xs">
+        Smart Campus Mobility System for Solar-Powered Tricycles
+      </p>
+      <p class="text-xs mt-1">
+        University of Port Harcourt — Faculty of Computing — Department of
+        Computer Science
+      </p>
+      <p class="text-xs mt-3">
+        © 2026 GreenRide. Developed by Ilodigwe Nzube E.
+      </p>
+    </footer>
+  </body>
+</html>
