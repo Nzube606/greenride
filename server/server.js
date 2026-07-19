@@ -56,9 +56,12 @@ io.on("connection", (socket) => {
 
   // Driver accepts a ride
   socket.on("ride:accept", (data) => {
-    console.log("Ride accepted:", data);
-    // Notify the specific passenger
-    io.emit("ride:accepted", data);
+    console.log("Ride accepted data received:", data);
+    io.emit("ride:accepted", {
+      rideId: data.rideId,
+      driverName: data.driverName,
+      driverPhone: data.driverPhone,
+    });
   });
 
   // Driver shares live location
