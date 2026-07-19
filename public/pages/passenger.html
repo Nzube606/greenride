@@ -487,6 +487,11 @@
             `📍 Pickup: ${pickupText}`;
           document.getElementById("activeDestinationInfo").textContent =
             `🏁 Destination: ${destinationText}`;
+          document.getElementById("driverPhoneSection").classList.add("hidden");
+          document
+            .getElementById("driverPhoneSection")
+            .classList.remove("flex");
+          document.getElementById("driverPhoneNumber").textContent = "";
 
           requestBtn.textContent = "Request Ride";
           requestBtn.disabled = false;
@@ -563,7 +568,24 @@
       socket.on("ride:completed", (data) => {
         if (data.rideId === currentRideId) {
           currentRideId = null;
+          window.lastPickupCoords = null;
           hideActiveRidePanel();
+          document.getElementById("pickupText").value = "";
+          document.getElementById("pickupCoords").value = "";
+          document.getElementById("destinationText").value = "";
+          document.getElementById("driverPhoneSection").classList.add("hidden");
+          document
+            .getElementById("driverPhoneSection")
+            .classList.remove("flex");
+          document.getElementById("driverPhoneNumber").textContent = "";
+          pickupCoords = null;
+          gpsActive = false;
+          const toggle = document.getElementById("gpsToggle");
+          const thumb = document.getElementById("gpsToggleThumb");
+          toggle.classList.remove("bg-green-500");
+          toggle.classList.add("bg-gray-300");
+          thumb.classList.remove("translate-x-6");
+          thumb.classList.add("translate-x-0.5");
           showBanner(
             "Your ride has been completed. Please pay your driver. Thank you for using GreenRide!",
             "success",
@@ -655,7 +677,11 @@
       function showActiveRidePanel(status, driver) {
         document.getElementById("requestForm").classList.add("hidden");
         document.getElementById("activeRidePanel").classList.remove("hidden");
-        document.getElementById("activeRideStatus").textContent = status;
+        const statusElement = document.getElementById("activeRideStatus");
+        statusElement.textContent = status;
+        setTimeout(() => {
+          statusElement.textContent = "";
+        }, 10000);
         document.getElementById("activeRideDriver").textContent = driver;
       }
 

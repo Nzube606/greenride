@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GreenRide — Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+      }
+      .tab-active {
+        border-bottom: 3px solid #16a34a;
+        color: #16a34a;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-gray-100">
+    <header
+      class="bg-green-700 text-white px-6 py-4 flex justify-between items-center shadow"
+    >
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">🛺</span>
+        <div>
+          <span class="font-bold text-lg">GreenRide</span>
+          <span class="text-xs bg-green-900 px-2 py-0.5 rounded-full ml-2"
+            >Admin</span
+          >
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <span id="adminName" class="text-sm font-medium"></span>
+        <button
+          onclick="logout()"
+          class="text-sm bg-white text-green-700 px-3 py-1 rounded-full font-medium hover:bg-green-50"
+        >
+          Logout
+        </button>
+      </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-6 space-y-6">
+      <div
+        id="statusBanner"
+        class="hidden rounded-xl px-4 py-3 text-sm font-medium"
+      ></div>
+
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white rounded-xl shadow p-4 text-center">
+          <p class="text-2xl font-bold text-green-600" id="statTotalRides">—</p>
+          <p class="text-xs text-gray-500 mt-1">Total Rides</p>
+        </div>
+        <div class="bg-white rounded-xl shadow p-4 text-center">
+          <p class="text-2xl font-bold text-yellow-500" id="statPendingRides">
+            —
+          </p>
+          <p class="text-xs text-gray-500 mt-1">Pending Rides</p>
+        </div>
+        <div class="bg-white rounded-xl shadow p-4 text-center">
+          <p class="text-2xl font-bold text-blue-500" id="statTotalDrivers">
+            —
+          </p>
+          <p class="text-xs text-gray-500 mt-1">Total Drivers</p>
+        </div>
+        <div class="bg-white rounded-xl shadow p-4 text-center">
+          <p
+            class="text-2xl font-bold text-purple-500"
+            id="statTotalPassengers"
+          >
+            —
+          </p>
+          <p class="text-xs text-gray-500 mt-1">Total Passengers</p>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex border-b border-gray-200 bg-white rounded-t-xl px-4">
+        <button
+          onclick="showTab('rides')"
+          id="tab-rides"
+          class="tab-active px-4 py-3 text-sm mr-4"
+        >
+          All Rides
+        </button>
+        <button
+          onclick="showTab('drivers')"
+          id="tab-drivers"
+          class="px-4 py-3 text-sm text-gray-500 mr-4"
+        >
+          Drivers
+        </button>
+        <button
+          onclick="showTab('passengers')"
+          id="tab-passengers"
+          class="px-4 py-3 text-sm text-gray-500 mr-4"
+        >
+          Passengers
+        </button>
+      </div>
+
+      <!-- ALL RIDES TAB -->
+      <div id="panel-rides" class="bg-white rounded-b-xl shadow p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-base font-semibold text-gray-800">All Rides</h2>
+          <select
+            id="rideFilter"
+            onchange="filterRides()"
+            class="text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+          >
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div id="ridesList" class="space-y-3">
+          <p class="text-sm text-gray-400">Loading...</p>
+        </div>
+      </div>
+
+      <!-- DRIVERS TAB -->
+      <div id="panel-drivers" class="hidden bg-white rounded-b-xl shadow p-6">
+        <h2 class="text-base font-semibold text-gray-800 mb-4">
+          Registered Drivers
+        </h2>
+        <div id="driversList" class="space-y-3">
+          <p class="text-sm text-gray-400">Loading...</p>
+        </div>
+      </div>
+
+      <!-- PASSENGERS TAB -->
+      <div
+        id="panel-passengers"
+        class="hidden bg-white rounded-b-xl shadow p-6"
+      >
+        <h2 class="text-base font-semibold text-gray-800 mb-4">
+          Registered Passengers
+        </h2>
+        <div id="passengersList" class="space-y-3">
+          <p class="text-sm text-gray-400">Loading...</p>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const API = "http://localhost:5000/api";
+      const token = localStorage.getItem("greenride_token");
+      const user = JSON.parse(localStorage.getItem("greenride_user") || "{}");
+
+      if (!token || user.role !== "admin") {
+        window.location.href = "login.html";
+      }
+
+      let allRides = [];
+
+      window.addEventListener("load", () => {
+        document.getElementById("adminName").textContent = user.fullName || "";
+        loadRides();
+        loadStats();
+
+        // Auto refresh every 5 seconds
+        setInterval(() => {
+          loadStats();
+          const activeTab = document.querySelector(".tab-active")?.id;
+          if (activeTab === "tab-rides") loadRides();
+          if (activeTab === "tab-drivers") loadDrivers();
+          if (activeTab === "tab-passengers") loadPassengers();
+        }, 5000);
+      });
+
+      // ── Tab switching ──────────────────────────────────────────────────────
+      function showTab(tab) {
+        ["rides", "drivers", "passengers"].forEach((t) => {
+          document.getElementById(`panel-${t}`).classList.add("hidden");
+          document.getElementById(`tab-${t}`).classList.remove("tab-active");
+          document.getElementById(`tab-${t}`).classList.add("text-gray-500");
+        });
+        document.getElementById(`panel-${tab}`).classList.remove("hidden");
+        document.getElementById(`tab-${tab}`).classList.add("tab-active");
+        document.getElementById(`tab-${tab}`).classList.remove("text-gray-500");
+
+        if (tab === "drivers") loadDrivers();
+        if (tab === "passengers") loadPassengers();
+      }
+
+      // ── Stats ──────────────────────────────────────────────────────────────
+      async function loadStats() {
+        try {
+          const [ridesRes, usersRes] = await Promise.all([
+            fetch(`${API}/rides/all`, {
+              headers: { Authorization: `Bearer ${token}` },
+            }),
+            fetch(`${API}/users/all`, {
+              headers: { Authorization: `Bearer ${token}` },
+            }),
+          ]);
+
+          const ridesData = await ridesRes.json();
+          const usersData = await usersRes.json();
+
+          const rides = ridesData.rides || [];
+          const users = usersData.users || [];
+
+          document.getElementById("statTotalRides").textContent = rides.length;
+          document.getElementById("statPendingRides").textContent =
+            rides.filter((r) => r.status === "pending").length;
+          document.getElementById("statTotalDrivers").textContent =
+            users.filter((u) => u.role === "driver").length;
+          document.getElementById("statTotalPassengers").textContent =
+            users.filter((u) => u.role === "passenger").length;
+        } catch (err) {
+          console.error("Error loading stats:", err);
+        }
+      }
+
+      // ── Rides ──────────────────────────────────────────────────────────────
+      async function loadRides() {
+        try {
+          const res = await fetch(`${API}/rides/all`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const data = await res.json();
+          allRides = data.rides || [];
+          renderRides(allRides);
+        } catch (err) {
+          document.getElementById("ridesList").innerHTML =
+            '<p class="text-sm text-red-400">Error loading rides.</p>';
+        }
+      }
+
+      function filterRides() {
+        const filter = document.getElementById("rideFilter").value;
+        const filtered =
+          filter === "all"
+            ? allRides
+            : allRides.filter((r) => r.status === filter);
+        renderRides(filtered);
+      }
+
+      function renderRides(rides) {
+        const list = document.getElementById("ridesList");
+        if (!rides || rides.length === 0) {
+          list.innerHTML =
+            '<p class="text-sm text-gray-400">No rides found.</p>';
+          return;
+        }
+
+        list.innerHTML = rides
+          .map(
+            (ride) => `
+        <div class="border border-gray-100 rounded-xl p-4 space-y-2">
+          <div class="flex justify-between items-start">
+            <div class="space-y-1">
+              <p class="text-sm font-semibold text-gray-800">
+                ${ride.pickupLocation.description} → ${ride.destination.description}
+              </p>
+              <p class="text-xs text-gray-500">
+                Passenger: ${ride.passenger?.fullName || "Unknown"} — ${ride.passenger?.phone || ""}
+              </p>
+              <p class="text-xs text-gray-500">
+                Driver: ${ride.driver ? `${ride.driver.fullName} — ${ride.driver.phone}` : "Not assigned"}
+              </p>
+              <p class="text-xs text-gray-400">${new Date(ride.createdAt).toLocaleString()}</p>
+            </div>
+            <span class="text-xs px-2 py-1 rounded-full font-medium flex-shrink-0 ${statusColor(ride.status)}">${ride.status}</span>
+          </div>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      // ── Drivers ────────────────────────────────────────────────────────────
+      async function loadDrivers() {
+        try {
+          const res = await fetch(`${API}/users/drivers`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const data = await res.json();
+          const list = document.getElementById("driversList");
+
+          if (!data.drivers || data.drivers.length === 0) {
+            list.innerHTML =
+              '<p class="text-sm text-gray-400">No drivers registered yet.</p>';
+            return;
+          }
+
+          list.innerHTML = data.drivers
+            .map(
+              (driver) => `
+          <div class="border border-gray-100 rounded-xl p-4">
+            <div class="flex justify-between items-center">
+              <div class="space-y-1">
+                <p class="text-sm font-semibold text-gray-800">${driver.fullName}</p>
+                <p class="text-xs text-gray-500">${driver.email} — ${driver.phone}</p>
+                <p class="text-xs text-gray-400">Vehicle: ${driver.vehicleNumber || "Not provided"}</p>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="text-xs px-2 py-0.5 rounded-full ${driver.isAvailable ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}">
+                    ${driver.isAvailable ? "Online" : "Offline"}
+                  </span>
+                  <span class="text-xs px-2 py-0.5 rounded-full ${driver.isActive ? "bg-blue-100 text-blue-700" : "bg-red-100 text-red-700"}">
+                    ${driver.isActive ? "Active" : "Deactivated"}
+                  </span>
+                </div>
+              </div>
+              <button
+                onclick="toggleUserStatus('${driver._id}', '${driver.isActive}', 'driver')"
+                class="text-xs px-3 py-1.5 rounded-lg font-medium border ${driver.isActive ? "border-red-300 text-red-600 hover:bg-red-50" : "border-green-300 text-green-600 hover:bg-green-50"}"
+              >
+                ${driver.isActive ? "Deactivate" : "Activate"}
+              </button>
+            </div>
+          </div>
+        `,
+            )
+            .join("");
+        } catch (err) {
+          document.getElementById("driversList").innerHTML =
+            '<p class="text-sm text-red-400">Error loading drivers.</p>';
+        }
+      }
+
+      // ── Passengers ─────────────────────────────────────────────────────────
+      async function loadPassengers() {
+        try {
+          const res = await fetch(`${API}/users/all`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const data = await res.json();
+          const passengers = (data.users || []).filter(
+            (u) => u.role === "passenger",
+          );
+          const list = document.getElementById("passengersList");
+
+          if (passengers.length === 0) {
+            list.innerHTML =
+              '<p class="text-sm text-gray-400">No passengers registered yet.</p>';
+            return;
+          }
+
+          list.innerHTML = passengers
+            .map(
+              (passenger) => `
+          <div class="border border-gray-100 rounded-xl p-4">
+            <div class="flex justify-between items-center">
+              <div class="space-y-1">
+                <p class="text-sm font-semibold text-gray-800">${passenger.fullName}</p>
+                <p class="text-xs text-gray-500">${passenger.email} — ${passenger.phone}</p>
+                <p class="text-xs text-gray-400">Joined: ${new Date(passenger.createdAt).toLocaleDateString()}</p>
+                <span class="text-xs px-2 py-0.5 rounded-full ${passenger.isActive ? "bg-blue-100 text-blue-700" : "bg-red-100 text-red-700"}">
+                  ${passenger.isActive ? "Active" : "Deactivated"}
+                </span>
+              </div>
+              <button
+                onclick="toggleUserStatus('${passenger._id}', '${passenger.isActive}', 'passenger')"
+                class="text-xs px-3 py-1.5 rounded-lg font-medium border ${passenger.isActive ? "border-red-300 text-red-600 hover:bg-red-50" : "border-green-300 text-green-600 hover:bg-green-50"}"
+              >
+                ${passenger.isActive ? "Deactivate" : "Activate"}
+              </button>
+            </div>
+          </div>
+        `,
+            )
+            .join("");
+        } catch (err) {
+          document.getElementById("passengersList").innerHTML =
+            '<p class="text-sm text-red-400">Error loading passengers.</p>';
+        }
+      }
+
+      // ── Toggle user status ─────────────────────────────────────────────────
+      async function toggleUserStatus(userId, currentStatus, type) {
+        try {
+          const res = await fetch(`${API}/users/${userId}/deactivate`, {
+            method: "PUT",
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            showBanner(data.message, "error");
+            return;
+          }
+
+          showBanner(data.message, "success");
+          loadStats();
+
+          if (type === "driver") loadDrivers();
+          if (type === "passenger") loadPassengers();
+        } catch (err) {
+          showBanner("Error updating user status", "error");
+        }
+      }
+
+      // ── Helpers ────────────────────────────────────────────────────────────
+      function showBanner(msg, type) {
+        const banner = document.getElementById("statusBanner");
+        banner.textContent = msg;
+        banner.className = `rounded-xl px-4 py-3 text-sm font-medium ${type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`;
+        banner.classList.remove("hidden");
+        setTimeout(() => banner.classList.add("hidden"), 6000);
+      }
+
+      function statusColor(status) {
+        const colors = {
+          pending: "bg-yellow-100 text-yellow-700",
+          accepted: "bg-blue-100 text-blue-700",
+          in_progress: "bg-purple-100 text-purple-700",
+          completed: "bg-green-100 text-green-700",
+          cancelled: "bg-red-100 text-red-700",
+        };
+        return colors[status] || "bg-gray-100 text-gray-700";
+      }
+
+      function logout() {
+        localStorage.removeItem("greenride_token");
+        localStorage.removeItem("greenride_user");
+        window.location.href = "login.html";
+      }
+    </script>
+  </body>
+</html>
