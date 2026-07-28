@@ -129,7 +129,6 @@
             <p id="activePassengerName" class="text-sm text-gray-700"></p>
             <p id="activePickup" class="text-sm text-gray-600"></p>
             <p id="activeDestination" class="text-sm text-gray-600"></p>
-            <p id="activePassengerPhone" class="text-sm text-gray-600"></p>
           </div>
           <div id="map" class="hidden"></div>
           <button
@@ -479,8 +478,6 @@
           `📍 Pickup: ${pickup}`;
         document.getElementById("activeDestination").textContent =
           `🏁 Destination: ${destination}`;
-        document.getElementById("activePassengerPhone").textContent =
-          passengerPhone ? `📞 ${passengerPhone}` : "";
 
         // Only show map if passenger used GPS
         if (pickupCoords && pickupCoords.lat) {
