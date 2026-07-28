@@ -101,6 +101,23 @@ mongoose
     server.listen(process.env.PORT, () => {
       console.log(`GreenRide server running on port ${process.env.PORT}`);
     });
+
+    // Keep-alive ping to prevent Render free tier spin-down
+    const BACKEND_URL = "https://greenride-backend-7aqt.onrender.com";
+    setInterval(async () => {
+      try {
+        const https = require("https");
+        https
+          .get(BACKEND_URL, (res) => {
+            console.log(`Keep-alive ping: ${res.statusCode}`);
+          })
+          .on("error", (err) => {
+            console.log(`Keep-alive ping failed: ${err.message}`);
+          });
+      } catch (err) {
+        console.log("Keep-alive error:", err.message);
+      }
+    }, 840000); // every 14 minutes
   })
   .catch((err) => {
     console.error("MongoDB connection error:", err);
